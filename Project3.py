@@ -6,12 +6,13 @@ import os
 
 def main():
     print(" Project 3 415 :^)")
-    for i in range(3):
+    for i in range(1):
         filec = []
         filev = []
         filew = []
         for j in ['c', 'v', 'w']:
-            filestring = '/Users/tank/Desktop/415_Project3/KnapsackTestData/p0%s_' % i + j + '.txt' # change directory
+            cwd = os.getcwd()
+            filestring = cwd + '/KnapsackTestData/p0%s_' % i + j + '.txt' # change directory
             file = open(filestring, 'r')
             if j == 'c':
                 filec = file.readlines()
