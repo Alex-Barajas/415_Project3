@@ -234,7 +234,10 @@ def main():
         print()
         # print('Task1b')
         task1b(filec[0], filev, filew)
-        
+
+
+        filev.pop(0)
+        filew.pop(0)
         #2A Greedy using sort
         greedy_optimal_set = []
         greedy_optimal_values = []
