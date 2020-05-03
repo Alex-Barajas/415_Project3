@@ -411,8 +411,8 @@ def main():
         print("Heap-based Greedy Approach Optimal values:", heap_result)
         heap_set = []
         for x in range(len(heap_optimal_value)):
-            for v in range(len(filev)):
-                if (heap_optimal_value[x] == filev[v]):
+            for v in range(len(heap_v)):
+                if (heap_optimal_value[x] == heap_v[v]):
                     heap_set.append(v + 1)
         heap_set.sort()
         print("Heap-based Greedy Approach Optimal subset:", heap_set)
