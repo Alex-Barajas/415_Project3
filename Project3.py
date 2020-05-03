@@ -4,6 +4,9 @@ import glob
 import os
 import math
 import time
+import matplotlib.pyplot as plt
+
+
 
 class basicOp:
     def __init__(self):
@@ -26,6 +29,8 @@ class basicOp:
 
     def getOperationsHeap(self):
         return self.basic_operations_heap
+    def getOperationSort(self):
+        return self.basic_operations_greedy
 
 def task1a(c, v, w):
     t0 = time.time()
@@ -148,7 +153,8 @@ def task1b(c, v, w):
     print("Space-efficient Dynamic Programming Optimal subset: ", opt_subset[::-1])
     print("Space-efficient Dynamic Programming Space Taken: ", a.size())
 
-
+greedy_count = 0
+heap_count = 0
 
 #TASK 2-A g Greedy Approach
 def knap_greedy(cap, weight, values, knap_sack):
@@ -170,7 +176,9 @@ def partition(values, weights, low, high):
     pivot = (values[high])/(weights[high])
     for j in range(low, high):
 
-        #basic_operations+=1 would go here
+        #basic_operations
+        global greedy_count
+        greedy_count +=1
 
         # If current element is greater than the pivot
         if values[j]/weights[j] > pivot:
@@ -199,12 +207,43 @@ def partition(values, weights, low, high):
 def quickSort(values, weights, low, high):
     if low < high:
         # create partition
-        part = partition(values, weights, low, high)
-        quickSort(values, weights,  low, part-1)
+        global greedy_count
+        greedy_count += 1
+        part = partition( values, weights, low, high)
+        quickSort( values, weights,  low, part-1)
         quickSort(values, weights, part + 1, high)
 
 
 # TASK 2B
+def heap_build(values, weights, n, i):
+    largest = i # intialize as root
+
+    left_child = 2 * i + 1
+    right_child = 2 * i + 2
+    # of basic ops
+    global heap_count
+    heap_count += 1
+    # if left child of root exists and is greater than root
+    if left_child < n and (values[i]/weights[i] > values[left_child]/weights[left_child]):
+        largest = left_child
+
+    # if right child of root exists and is greater than root
+    if right_child < n and (values[largest]/weights[largest] > values[right_child]/weights[right_child]):
+        largest = right_child
+
+    # change root if need 2
+    if largest != i:
+        swap = values[i]
+        values[i] = values[largest]
+        values[largest] = swap
+
+        swap_w = weights[i]
+        weights[i] = weights[largest]
+        weights[largest] = swap_w
+
+        #recursively heapify
+        heap_build(values, weights, n, largest)
+
 def deleteMax(weights, values):
     # get last element
     total_v = len(values)
@@ -227,39 +266,8 @@ def deleteMax(weights, values):
     #heapify
     heap_sort(values, weights, total_v)
 
-def heap_build(values, weights, n, i):
-    largest = i # intialize as root
-
-    left_child = 2 * i + 1
-    right_child = 2 * i + 2
-    # of basic ops
-
-    # if left child of root exists and is greater than root
-    if left_child < n and (values[i]/weights[i] > values[left_child]/weights[left_child]):
-        largest = left_child
-
-    # if right child of root exists and is greater than root
-    if right_child < n and (values[largest]/weights[largest] > values[right_child]/weights[right_child]):
-        largest = right_child
-
-    # change root if need 2
-    if largest != i:
-        swap = values[i]
-        values[i] = values[largest]
-        values[largest] = swap
-
-        swap_w = weights[i]
-        weights[i] = weights[largest]
-        weights[largest] = swap_w
-
-        #recursively heapify
-        heap_build(values, weights, n, largest)
-
-
-
 def heap_sort(values, weights, total):
     #build max heap
-
     for i in range(total, -1, -1):
         heap_build(values, weights, total, i)
 
@@ -275,8 +283,6 @@ def heap_sort(values, weights, total):
 
         #build
         heap_build(values, weights, i, 0)
-
-
 
 
 def greedy_heap(weights, values, cap, heap_sack):
@@ -332,9 +338,7 @@ def main():
         print()
         # print('Task1b')
         task1b(filec[0], filev, filew)
-
-
-
+        print()
 
         filev.pop(0)
         filew.pop(0)
@@ -342,29 +346,18 @@ def main():
         # copies for heaping
         heap_v2 = []
         heap_v2.extend(filev)
-
         heap_w = []
         heap_w.extend(filew)
 
-        #heap_v = [i for i in filev]
-        print(filev)
-        print(heap_v)
-        print(heap_v2)
-        #print(heap_v)
-
         #2A Greedy using quicKsort
 
-        #greedy_optimal_set = []
         greedy_optimal_values = []
         len_values = len(filev)
-
 
         #sort the values
         quickSort(filev, filew, 0, len_values-1)
         greedy_result = knap_greedy(filec[0], filew, filev, greedy_optimal_values)
 
-
-        print ()
         print("Greedy Approach Optimal value:", greedy_result)
         greedy_set = []
         for w in range(len(greedy_optimal_values)):
@@ -373,15 +366,14 @@ def main():
                     greedy_set.append(g + 1)
         greedy_set.sort()
         print("Greedy Approach Optimal subset:", greedy_set)
-        #print("Greedy Approach Number of Operations:", greedy_operations)
+        print("Greedy Approach Number of Operations:", greedy_count)
         print()
 
         # TASK 2B PRINT
         heap_result = []
         heap_optimal_value = []
-
-        heap_sort(heap_v2, heap_w, len_values) # heap_sort(filev, filew, len_values)previously had this if heao_v2 doesnt work out
-        heap_result = greedy_heap(heap_w, heap_v2, filec[0], heap_optimal_value) # heap_result = greedy_heap(filew, filev, filec[0], heap_optimal_value)
+        heap_sort(heap_v2, heap_w, len_values)
+        heap_result = greedy_heap(heap_w, heap_v2, filec[0], heap_optimal_value)
 
         print("Heap-based Greedy Approach Optimal values:", heap_result)
         heap_set = []
@@ -391,8 +383,19 @@ def main():
                     heap_set.append(v + 1)
         heap_set.sort()
         print("Heap-based Greedy Approach Optimal subset:", heap_set)
+        print("Heap-based Greedy Approach Number of Operations: ", heap_count)
 
+        #Graphing for task 2
+        task2a = []
+        task2b =[]
+        task2a.append(greedy_count)
+        task2b.append(heap_count)
 
+        plt.title("Greedy Approach")
+        plt.xlabel("n: number of items")
+        plt.ylabel("Time: Basic-ops")
+        plt.plot(task2a, task2b)
+        plt.show()
 main()
 
 
