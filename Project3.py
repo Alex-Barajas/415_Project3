@@ -351,8 +351,7 @@ def main():
                 
 
         report = basicOp()
-        heap_v = []
-        heap_v.extend(filev)
+
 
         #### our code here #####
         # print('Task1a')
@@ -373,6 +372,8 @@ def main():
         heap_v2.extend(filev)
         heap_w = []
         heap_w.extend(filew)
+        unSorted = []
+        unSorted.extend(filev)
 
         #2A Greedy using quicKsort
 
@@ -390,8 +391,8 @@ def main():
         print("Greedy Approach Optimal value:", greedy_result)
         greedy_set = []
         for w in range(len(greedy_optimal_values)):
-            for g in range(len(filev)):
-                if (greedy_optimal_values[w] == filev[g]):
+            for g in range(len(unSorted)):
+                if (greedy_optimal_values[w] == unSorted[g]):
                     greedy_set.append(g + 1)
         greedy_set.sort()
         print("Greedy Approach Optimal subset:", greedy_set)
@@ -411,8 +412,8 @@ def main():
         print("Heap-based Greedy Approach Optimal values:", heap_result)
         heap_set = []
         for x in range(len(heap_optimal_value)):
-            for v in range(len(heap_v)):
-                if (heap_optimal_value[x] == heap_v[v]):
+            for v in range(len(unSorted)):
+                if (heap_optimal_value[x] == unSorted[v]):
                     heap_set.append(v + 1)
         heap_set.sort()
         print("Heap-based Greedy Approach Optimal subset:", heap_set)
