@@ -4,8 +4,6 @@ import glob
 import os
 import math
 import time
-import matplotlib.pyplot as plt
-
 
 
 class basicOp:
@@ -26,6 +24,7 @@ class basicOp:
             print("doesn't exist bro")
             return
         return self.dict[name]
+    #def addCount(self):
 
     def getOperationsHeap(self):
         return self.basic_operations_heap
@@ -153,8 +152,7 @@ def task1b(c, v, w):
     print("Space-efficient Dynamic Programming Optimal subset: ", opt_subset[::-1])
     print("Space-efficient Dynamic Programming Space Taken: ", a.size())
 
-greedy_count = 0
-heap_count = 0
+
 
 #TASK 2-A g Greedy Approach
 def knap_greedy(cap, weight, values, knap_sack):
@@ -170,15 +168,15 @@ def knap_greedy(cap, weight, values, knap_sack):
             knap_sack.append(values[i]) #i append values
     return total_v
 
-def partition(values, weights, low, high):
+def partition(values, weights, low, high,operations):
     i = (low-1) # index of small element
 
     pivot = (values[high])/(weights[high])
     for j in range(low, high):
 
         #basic_operations
-        global greedy_count
-        greedy_count +=1
+        operations.basic_operations_greedy += 1
+
 
         # If current element is greater than the pivot
         if values[j]/weights[j] > pivot:
@@ -204,25 +202,27 @@ def partition(values, weights, low, high):
 
     return i + 1
 
-def quickSort(values, weights, low, high):
+def quickSort(values, weights, low, high, operations):
     if low < high:
         # create partition
-        global greedy_count
-        greedy_count += 1
-        part = partition( values, weights, low, high)
-        quickSort( values, weights,  low, part-1)
-        quickSort(values, weights, part + 1, high)
+        #basic ops
+        operations.basic_operations_greedy += 1
+
+        #print(operations.basic_operations_greedy)
+
+        part = partition(values, weights, low, high, operations)
+        quickSort( values, weights,  low, part-1, operations)
+        quickSort(values, weights, part + 1, high, operations)
 
 
 # TASK 2B
-def heap_build(values, weights, n, i):
+def heap_build(values, weights, n, i, operations):
     largest = i # intialize as root
 
     left_child = 2 * i + 1
     right_child = 2 * i + 2
     # of basic ops
-    global heap_count
-    heap_count += 1
+    operations.basic_operations_heap += 1
     # if left child of root exists and is greater than root
     if left_child < n and (values[i]/weights[i] > values[left_child]/weights[left_child]):
         largest = left_child
@@ -242,10 +242,11 @@ def heap_build(values, weights, n, i):
         weights[largest] = swap_w
 
         #recursively heapify
-        heap_build(values, weights, n, largest)
+        heap_build(values, weights, n, largest, operations)
 
-def deleteMax(weights, values):
+def deleteMax(weights, values, operations):
     # get last element
+    operations.basic_operations_heap += 0
     total_v = len(values)
     last = total_v - 1 #values - 1 if i use index when i call
 
@@ -261,15 +262,16 @@ def deleteMax(weights, values):
     values.pop()
     weights.pop()
 
-    # call total values again ?
+    #call total values again
     total_v = len(values)
     #heapify
-    heap_sort(values, weights, total_v)
+    heap_sort(values, weights, total_v, operations)
 
-def heap_sort(values, weights, total):
+def heap_sort(values, weights, total, operations):
     #build max heap
+    operations.basic_operations_heap += 0
     for i in range(total, -1, -1):
-        heap_build(values, weights, total, i)
+        heap_build(values, weights, total, i, operations)
 
     for i in range(total-1, 0, -1):
         #swap values and weights
@@ -282,11 +284,12 @@ def heap_sort(values, weights, total):
         weights[0] = swap_w
 
         #build
-        heap_build(values, weights, i, 0)
+        heap_build(values, weights, i, 0, operations)
 
 
-def greedy_heap(weights, values, cap, heap_sack):
+def greedy_heap(weights, values, cap, heap_sack, operations):
     # calculates total values
+    operations.basic_operations_greedy += 0 # this will just add 0 since we need it to pass operations
     total_value = 0
     total_weight = 0
     for i in range(len(values)):
@@ -296,7 +299,7 @@ def greedy_heap(weights, values, cap, heap_sack):
             total_weight += weights[0]
             total_value += values[0]
             heap_sack.append(values[0])
-        deleteMax(weights, values)
+        deleteMax(weights, values, operations)
 
     return total_value
 
@@ -348,8 +351,7 @@ def main():
                 
 
         report = basicOp()
-        heap_v = []
-        heap_v.extend(filev)
+
 
         #### our code here #####
         # print('Task1a')
@@ -370,55 +372,55 @@ def main():
         heap_v2.extend(filev)
         heap_w = []
         heap_w.extend(filew)
+        unSorted = []
+        unSorted.extend(filev)
 
         #2A Greedy using quicKsort
 
         greedy_optimal_values = []
         len_values = len(filev)
 
-        #sort the values
-        quickSort(filev, filew, 0, len_values-1)
+        # create instance
+        operations_greedy = basicOp()
+        # sort the values
+        quickSort(filev, filew, 0, len_values-1, operations_greedy)
         greedy_result = knap_greedy(filec[0], filew, filev, greedy_optimal_values)
 
+        num = operations_greedy.getOperationSort() # get total number of operations
 
         print("Greedy Approach Optimal value:", greedy_result)
         greedy_set = []
         for w in range(len(greedy_optimal_values)):
-            for g in range(len(filev)):
-                if (greedy_optimal_values[w] == filev[g]):
+            for g in range(len(unSorted)):
+                if (greedy_optimal_values[w] == unSorted[g]):
                     greedy_set.append(g + 1)
         greedy_set.sort()
         print("Greedy Approach Optimal subset:", greedy_set)
-        print("Greedy Approach Number of Operations:", greedy_count)
+        print("Greedy Approach Number of Operations:", num)
         print()
 
-        # TASK 2B PRINT
+        # TASK 2B Using Heap Based
+
+        operations_heap = basicOp() # create instance of class
         heap_result = []
         heap_optimal_value = []
-        heap_sort(heap_v2, heap_w, len_values)
-        heap_result = greedy_heap(heap_w, heap_v2, filec[0], heap_optimal_value)
+        heap_sort(heap_v2, heap_w, len_values, operations_heap)
+        heap_result = greedy_heap(heap_w, heap_v2, filec[0], heap_optimal_value, operations_heap)
+        num2 = operations_heap.getOperationsHeap() # call getOper to get total num of operations
+
 
         print("Heap-based Greedy Approach Optimal values:", heap_result)
         heap_set = []
         for x in range(len(heap_optimal_value)):
-            for v in range(len(filev)):
-                if (heap_optimal_value[x] == filev[v]):
+            for v in range(len(unSorted)):
+                if (heap_optimal_value[x] == unSorted[v]):
                     heap_set.append(v + 1)
         heap_set.sort()
         print("Heap-based Greedy Approach Optimal subset:", heap_set)
-        print("Heap-based Greedy Approach Number of Operations: ", heap_count)
+        print("Heap-based Greedy Approach Number of Operations: ", num2)
 
-        #Graphing for task 2
-        task2a = []
-        task2b =[]
-        task2a.append(greedy_count)
-        task2b.append(heap_count)
 
-        plt.title("Greedy Approach")
-        plt.xlabel("n: number of items")
-        plt.ylabel("Time: Basic-ops")
-        plt.plot(task2a, task2b)
-        plt.show()
+
 main()
 
 
