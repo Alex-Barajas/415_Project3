@@ -52,7 +52,7 @@ def task1a(c, v, w):
     i = len(v) - 1
     j = c
     start = table[i][j]
-    while j > 0:
+    while j > 0 and i > 0:
         other = table[i - 1][j]
         if start > other:
             opt_subset.append(i)
@@ -139,7 +139,7 @@ def task1b(c, v, w):
     # back track
     start = a.search(binFormat(c, v, i, j), i, j)
 
-    while j > 0:
+    while j > 0 and i > 0:
         other = a.search(binFormat(c, v, i - 1, j), i - 1, j)
         if start > other:
             opt_subset.append(i)
@@ -300,31 +300,52 @@ def greedy_heap(weights, values, cap, heap_sack):
 
     return total_value
 
-
+  
 def main():
-    print('----------------------')
-    for i in range(2, 3):
+    x = input("Enter range of files you want to be read: ").split(',')
+    for i in range(int(x[0]), int(x[1])+1):
         filec = []
         filev = []
         filew = []
-        for j in ['c', 'v', 'w']:
-            cwd = os.getcwd()
-            filestring = cwd + '/KnapsackTestData/p0%s_' % i + j + '.txt'  # change directory
-            file = open(filestring, 'r')
-            if j == 'c':
-                filec = file.readlines()
-                filec = [x.strip() for x in filec]  # removes chars we dont want
-                filec = list(map(int, filec))  # maps the strings to ints
-                # print(filec)
-            if j == 'v':
-                filev = file.readlines()
-                filev = [x.strip() for x in filev]
-                filev = list(map(int, filev))
-                # print(filev)
-            if j == 'w':
-                filew = file.readlines()
-                filew = [x.strip() for x in filew]
-                filew = list(map(int, filew))
+        if i < 9:
+            for j in ['c', 'v', 'w']:
+                cwd = os.getcwd()
+                filestring = cwd + '/KnapsackTestData/p0%s_' % i + j + '.txt'  # change directory
+                file = open(filestring, 'r')
+                if j == 'c':
+                    filec = file.readlines()
+                    filec = [x.strip() for x in filec]  # removes chars we dont want
+                    filec = list(map(int, filec))  # maps the strings to ints
+                    # print(filec)
+                if j == 'v':
+                    filev = file.readlines()
+                    filev = [x.strip() for x in filev]
+                    filev = list(map(int, filev))
+                    # print(filev)
+                if j == 'w':
+                    filew = file.readlines()
+                    filew = [x.strip() for x in filew]
+                    filew = list(map(int, filew))
+        else:
+            for j in ['c', 'v', 'w']:
+                cwd = os.getcwd()
+                filestring = cwd + '/KnapsackTestData/p%s_' % i + j + '.txt'  # change directory
+                file = open(filestring, 'r')
+                if j == 'c':
+                    filec = file.readlines()
+                    filec = [x.strip() for x in filec]  # removes chars we dont want
+                    filec = list(map(int, filec))  # maps the strings to ints
+                    # print(filec)
+                if j == 'v':
+                    filev = file.readlines()
+                    filev = [x.strip() for x in filev]
+                    filev = list(map(int, filev))
+                    # print(filev)
+                if j == 'w':
+                    filew = file.readlines()
+                    filew = [x.strip() for x in filew]
+                    filew = list(map(int, filew))
+                
 
         report = basicOp()
         heap_v = []
@@ -332,6 +353,7 @@ def main():
 
         #### our code here #####
         # print('Task1a')
+        print('----------------------')
         print("Knapsack capacity = ", filec[0], " -- Total number of items = ", len(filev))
         print()
         task1a(filec[0], filev, filew)
@@ -357,6 +379,7 @@ def main():
         #sort the values
         quickSort(filev, filew, 0, len_values-1)
         greedy_result = knap_greedy(filec[0], filew, filev, greedy_optimal_values)
+
 
         print("Greedy Approach Optimal value:", greedy_result)
         greedy_set = []
