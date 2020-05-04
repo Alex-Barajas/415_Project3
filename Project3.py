@@ -203,11 +203,10 @@ def partition(values, weights, low, high,operations):
     return i + 1
 
 def quickSort(values, weights, low, high, operations):
+    operations.basic_operations_greedy += 1
     if low < high:
         # create partition
         #basic ops
-        operations.basic_operations_greedy += 1
-
         #print(operations.basic_operations_greedy)
 
         part = partition(values, weights, low, high, operations)
